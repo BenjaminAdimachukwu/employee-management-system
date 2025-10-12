@@ -54,6 +54,7 @@ employee-management-system/
 - PostgreSQL 15+
 - Git
 
+
 # Installation & Setup
 
  ## 1. clone repository
@@ -65,24 +66,26 @@ brew services start postgresql@15
 
 createdb employee_db
 
+
 ## 3. Start services in order:
 
-## 1. Service Discovery
+### 1. Service Discovery
 mvn spring-boot:run -pl discovery-service
 
-## 2. Config Server
+### 2. Config Server
 mvn spring-boot:run -pl config-server
 
-## 3. API Gateway
+### 3. API Gateway
 mvn spring-boot:run -pl api-gateway
 
-## 4. Auth Service
+### 4. Auth Service
 mvn spring-boot:run -pl auth-service
 
-## 5. Employee Service
+### 5. Employee Service
 mvn spring-boot:run -pl employee-service
 
-Access Points
+
+# Access Points
 Eureka Dashboard: http://localhost:8761
 
 API Gateway: http://localhost:8080
@@ -111,21 +114,22 @@ GET  /api/employees/** → Employee Service
 GET  /eureka/web/**    → Eureka Dashboard
 GET  /config/**        → Config Server
 
-## Testing:
-## Test service health
+
+# Testing:
+### Test service health
 curl http://localhost:8080/actuator/health
 
-## Test Eureka registration
+### Test Eureka registration
 curl http://localhost:8761/eureka/apps
 
-## Test configuration
+### Test configuration
 curl http://localhost:8888/api-gateway/default
 
 
-## Author
+### Author
 Benjamin Adimachukwu
 
-## License
+### License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 GitHub: https://github.com/BenjaminAdimachukwu
