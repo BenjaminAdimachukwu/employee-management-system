@@ -138,4 +138,6 @@ Benjamin Adimachukwu
 # License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-GitHub: https://github.com/BenjaminAdimachukwu
+
+# GitHub: https://github.com/BenjaminAdimachukwu
+
