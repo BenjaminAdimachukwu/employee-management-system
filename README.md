@@ -110,9 +110,13 @@ Each service fetches its configuration from the Config Server, which pulls from 
 Via API Gateway (http://localhost:8080)
 
 GET  /auth/**          → Auth Service
+
 GET  /api/employees/** → Employee Service
+
 GET  /eureka/web/**    → Eureka Dashboard
+
 GET  /config/**        → Config Server
+
 
 
 # Testing:
@@ -124,6 +128,7 @@ curl http://localhost:8761/eureka/apps
 
 ### Test configuration
 curl http://localhost:8888/api-gateway/default
+
 
 
 ### Author
