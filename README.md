@@ -30,12 +30,19 @@ A complete microservices-based Employee Management System built with Spring Boot
 
 ##  Project Structure
 employee-management-system/
+
 ├── discovery-service/ # Eureka Service Discovery Server
+
 ├── config-server/ # Spring Cloud Config Server
+
 ├── api-gateway/ # Spring Cloud Gateway
+
 ├── auth-service/ # Authentication & Authorization Service
+
 ├── employee-service/ # Employee Management Service
+
 ├── pom.xml # Parent POM (Maven Multi-module)
+
 └── README.md # This file
 
 
@@ -47,32 +54,32 @@ employee-management-system/
 - PostgreSQL 15+
 - Git
 
-### Installation & Setup
+# Installation & Setup
 
-1. **Clone the repository**
-   ```bash
+ ## 1. clone repository
    https://github.com/BenjaminAdimachukwu/employee-management-system.git
    
-2. Start PostgreSQL
+## 2. Start PostgreSQL
 
 brew services start postgresql@15
+
 createdb employee_db
 
-3. Start services in order:
+## 3. Start services in order:
 
-# 1. Service Discovery
+## 1. Service Discovery
 mvn spring-boot:run -pl discovery-service
 
-# 2. Config Server
+## 2. Config Server
 mvn spring-boot:run -pl config-server
 
-# 3. API Gateway
+## 3. API Gateway
 mvn spring-boot:run -pl api-gateway
 
-# 4. Auth Service
+## 4. Auth Service
 mvn spring-boot:run -pl auth-service
 
-# 5. Employee Service
+## 5. Employee Service
 mvn spring-boot:run -pl employee-service
 
 Access Points
@@ -86,7 +93,8 @@ Auth Service Health: http://localhost:8081/actuator/health
 
 Employee Service Health: http://localhost:8082/actuator/health
 
-Configuration
+
+## Configuration
 
 Configuration is managed centrally via GitHub:
 
@@ -94,7 +102,8 @@ Config Repository: https://github.com/BenjaminAdimachukwu/employee-management-co
 
 Each service fetches its configuration from the Config Server, which pulls from the GitHub repository.
 
-API Endpoints
+
+## API Endpoints
 Via API Gateway (http://localhost:8080)
 
 GET  /auth/**          → Auth Service
@@ -102,20 +111,21 @@ GET  /api/employees/** → Employee Service
 GET  /eureka/web/**    → Eureka Dashboard
 GET  /config/**        → Config Server
 
-Testing:
-# Test service health
+## Testing:
+## Test service health
 curl http://localhost:8080/actuator/health
 
-# Test Eureka registration
+## Test Eureka registration
 curl http://localhost:8761/eureka/apps
 
-# Test configuration
+## Test configuration
 curl http://localhost:8888/api-gateway/default
 
-Author
+
+## Author
 Benjamin Adimachukwu
 
-License
+## License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 GitHub: https://github.com/BenjaminAdimachukwu
