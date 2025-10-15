@@ -1,8 +1,14 @@
-Perfect! Here's the best place to add the bash script instructions in your README:
+
 
 # **Employee Management System - Microservices Architecture**
 
 A complete microservices-based Employee Management System built with Spring Boot, featuring service discovery, centralized configuration, API gateway, and PostgreSQL database.
+
+## 🚀 Current Status
+- ✅ **Foundation Complete**: Microservices architecture, authentication, security
+- ✅ **Core Features**: User registration, login, JWT tokens, service discovery
+- 🔄 **In Progress**: Employee CRUD operations, additional role-based endpoints
+- 🔄 **Planned**: Docker containerization, event-driven architecture
 
 ## 🏗️ Architecture Overview
 
