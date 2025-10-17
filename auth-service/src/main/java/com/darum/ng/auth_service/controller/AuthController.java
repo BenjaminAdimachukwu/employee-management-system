@@ -12,6 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -79,6 +82,42 @@ public ResponseEntity<AuthResponse>loginUser(@RequestBody AuthRequest authReques
         );
         logger.info("Login successful for user: {}", authRequest.getUsername());
         return ResponseEntity.ok(authResponse);
+}
+
+@PostMapping("/register/employee")
+public  ResponseEntity<Map<String, Object>> registerEmployee(@RequestBody  Map<String, Object> request) {
+
+        try {
+            String username = request.get("username").toString();
+            String email = request.get("email").toString();
+            String password = request.get("password").toString();
+            String firstName = request.get("firstName").toString();
+            String lastName = request.get("lastName").toString();
+
+            // Validate required fields
+            if (username == null || email == null || password == null) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("error", "Missing required fields: username, email, password");
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+
+            // Create user with EMPLOYEE role
+            User user = authService.registerUser(username, email, password, "ROLE_EMPLOYEE");
+
+            // Return user ID for linking with employee record
+            Map<String, Object> response = new HashMap<>();
+            response.put("userId", user.getId());
+            response.put("username", user.getUsername());
+            response.put("email", user.getEmail());
+            response.put("message", "Employee User Account registered successfully");
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Employee registration failed: {}", e.getMessage());
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Employee registration failed: " + e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
 }
 
 @GetMapping("/validate")
