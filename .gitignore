@@ -40,3 +40,4 @@ temp/
 # Application properties (optional - since you're using Config Server)
 */src/main/resources/application*.yml
 */src/main/resources/application*.properties
+.env
