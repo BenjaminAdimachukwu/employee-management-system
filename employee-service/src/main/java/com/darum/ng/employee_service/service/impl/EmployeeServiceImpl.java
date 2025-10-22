@@ -11,12 +11,14 @@ import com.darum.ng.employee_service.repository.DepartmentRepository;
 import com.darum.ng.employee_service.repository.EmployeeRepository;
 import com.darum.ng.employee_service.service.DepartmentService;
 import com.darum.ng.employee_service.service.EmployeeService;
+import com.darum.ng.employee_service.utils.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -30,13 +32,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     private DepartmentRepository departmentRepository;
     private AuthServiceClient  authServiceClient;
     private DepartmentService departmentService;
+    private final SecurityUtils securityUtils;
+
 
     @Autowired
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository, DepartmentRepository departmentRepository, AuthServiceClient authServiceClient, DepartmentService departmentService) {
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository, DepartmentRepository departmentRepository, AuthServiceClient authServiceClient, DepartmentService departmentService, SecurityUtils securityUtils) {
         this.employeeRepository = employeeRepository;
         this.departmentRepository = departmentRepository;
         this.authServiceClient = authServiceClient;
         this.departmentService = departmentService;
+        this.securityUtils = securityUtils;
     }
 
 
@@ -133,9 +138,32 @@ employee.setDepartment(department);
     @Override
     public List<EmployeeResponse> getAllEmployees() {
         logger.info("Fetching all employees");
-        return employeeRepository.findAll().stream()
-                .map(this::mapToEmployeeResponse)
-                .collect(Collectors.toList());
+        if (securityUtils.isAdmin()) {
+            return employeeRepository.findAll().stream()
+                    .map(this::mapToEmployeeResponse)
+                    .collect(Collectors.toList());
+
+        } else if (securityUtils.isManager()) {
+            Long managerDepartmentId = securityUtils.getCurrentUserDepartmentId();
+
+            if (managerDepartmentId == null) {
+                return Collections.emptyList();
+            }
+            return employeeRepository.findEmployeesByDepartment(managerDepartmentId).stream()
+                    .map(this::mapToEmployeeResponse)
+                    .collect(Collectors.toList());
+
+            //COMPLETE: Employee sees only themselves
+        }else {
+            Long employeeId = securityUtils.getCurrentUserEmployeeId();
+            if (employeeId == null) {
+                return Collections.emptyList();
+            }
+
+            return employeeRepository.findById(employeeId)
+                    .map(employee -> List.of(mapToEmployeeResponse(employee)))
+                    .orElse(Collections.emptyList());
+        }
     }
 
     @Override
@@ -158,7 +186,12 @@ employee.setDepartment(department);
 
     @Override
     public List<EmployeeResponse> getEmployeesByDepartment(Long departmentId) {
-        logger.info("Fetching employees for department ID: {}", departmentId);
+
+        if (!securityUtils.canAccessDepartment(departmentId)) {
+            throw new RuntimeException("Access denied to department: " + departmentId);
+        }
+
+            logger.info("Fetching employees for department ID: {}", departmentId);
         return employeeRepository.findEmployeesByDepartment(departmentId)
                 .stream()
                 .map(this::mapToEmployeeResponse)
@@ -208,8 +241,23 @@ employee.setDepartment(department);
         logger.info("Fetching employees with status: {}", status);
         Employee.EmployeeStatus employeeStatus = Employee.EmployeeStatus.valueOf(status.toUpperCase());
 
-        return employeeRepository.findByStatus(employeeStatus).stream()
-                .map(this::mapToEmployeeResponse).collect(Collectors.toList());
+        if (securityUtils.isAdmin()) {
+            return employeeRepository.findByStatus(employeeStatus).stream()
+                    .map(this::mapToEmployeeResponse).collect(Collectors.toList());
+        } else if (securityUtils.isManager()) {
+            Long managerDepartmentId = securityUtils.getCurrentUserDepartmentId();
+            if (managerDepartmentId == null) return Collections.emptyList();
+
+            return employeeRepository.findByStatusAndDepartmentId(employeeStatus, managerDepartmentId).stream()
+                    .map(this::mapToEmployeeResponse).collect(Collectors.toList());
+        } else {
+            Long employeeId = securityUtils.getCurrentUserEmployeeId();
+            if (employeeId == null) return Collections.emptyList();
+
+            return employeeRepository.findByIdAndStatus(employeeId, employeeStatus)
+                    .map(employee -> List.of(mapToEmployeeResponse(employee)))
+                    .orElse(Collections.emptyList());
+        }
     }
 
     @Override
@@ -246,5 +294,11 @@ employee.setDepartment(department);
            employeeResponse.setDepartmentName(employee.getDepartment().getName());
        }
        return employeeResponse;
+    }
+    // Add method to get current user's employee record
+    public EmployeeResponse getCurrentUserEmployee() {
+        // This requires linking auth user to employee
+        // For now, we'll handle this through the controller
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 }

@@ -27,6 +27,12 @@ public class Department {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "manager_id")
+    private Long managerId;
+
+    @Column(name = "manager_user_id")
+    private Long managerUserId;
+
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 

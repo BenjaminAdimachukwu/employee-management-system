@@ -93,6 +93,10 @@ public  ResponseEntity<Map<String, Object>> registerEmployee(@RequestBody  Map<S
             String password = request.get("password").toString();
             String firstName = request.get("firstName").toString();
             String lastName = request.get("lastName").toString();
+            String role = "ROLE_EMPLOYEE";
+            if( request.containsKey("role") ) {
+                role = request.get("role").toString();
+            }
 
             // Validate required fields
             if (username == null || email == null || password == null) {
@@ -102,13 +106,14 @@ public  ResponseEntity<Map<String, Object>> registerEmployee(@RequestBody  Map<S
             }
 
             // Create user with EMPLOYEE role
-            User user = authService.registerUser(username, email, password, "ROLE_EMPLOYEE");
+            User user = authService.registerUser(username, email, password, role);
 
             // Return user ID for linking with employee record
             Map<String, Object> response = new HashMap<>();
             response.put("userId", user.getId());
             response.put("username", user.getUsername());
             response.put("email", user.getEmail());
+            response.put("role", user.getRole().name());
             response.put("message", "Employee User Account registered successfully");
 
             return ResponseEntity.ok(response);
@@ -119,6 +124,32 @@ public  ResponseEntity<Map<String, Object>> registerEmployee(@RequestBody  Map<S
             return ResponseEntity.badRequest().body(errorResponse);
         }
 }
+
+    @PostMapping("/register/admin")
+    public ResponseEntity<Map<String, Object>> registerAdmin(@RequestBody Map<String, Object> request) {
+        try {
+            Map<String, Object> adminRequest = new HashMap<>(request);
+            adminRequest.put("role", "ROLE_ADMIN");
+            return registerEmployee(adminRequest);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Admin registration failed: " + e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    @PostMapping("/register/manager")
+    public ResponseEntity<Map<String, Object>> registerManager(@RequestBody Map<String, Object> request) {
+        try {
+            Map<String, Object> managerRequest = new HashMap<>(request);
+            managerRequest.put("role", "ROLE_MANAGER");
+            return registerEmployee(managerRequest);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Manager registration failed: " + e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
 
 @GetMapping("/validate")
 public ResponseEntity<TokenValidationResponse>validateToken(@RequestHeader("Authorization") String authHeader) {
